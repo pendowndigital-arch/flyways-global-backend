@@ -13,21 +13,12 @@ jobs:
       DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
       DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
     steps:
-      - name: Write SSH key
+      - name: Set up deploy SSH key
         run: |
           mkdir -p ~/.ssh
           printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-
-      - name: Show key fingerprint (not a secret)
-        run: ssh-keygen -lf ~/.ssh/id_ed25519
-
-      - name: Keyscan host
-        run: ssh-keyscan -p "${DEPLOY_PORT:-22}" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
-
-      - name: Verbose SSH auth test
-        run: |
-          ssh -vvv -i ~/.ssh/id_ed25519 -p "${DEPLOY_PORT:-22}" -o BatchMode=yes "$DEPLOY_USER@$DEPLOY_HOST" echo DIAG_OK 2>&1 | grep -E "Offering|Server accepts|Authentications that can continue|Authentication succeeded|DIAG_OK|Trying private key|Permission denied" || true
+          ssh-keyscan -p "${DEPLOY_PORT:-22}" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
 
       - name: Deploy over SSH
         run: |
