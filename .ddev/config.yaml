@@ -1,6 +1,6 @@
 name: flyways-global-backend
 type: drupal11
-docroot: web
+docroot: ""
 php_version: "8.3"
 webserver_type: nginx-fpm
 xdebug_enabled: false

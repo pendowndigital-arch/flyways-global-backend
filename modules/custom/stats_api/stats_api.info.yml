@@ -1,0 +1,8 @@
+name: 'Stats API'
+type: module
+description: 'REST API for site stats.'
+core_version_requirement: ^10 || ^11
+package: Custom
+dependencies:
+  - drupal:rest
+  - drupal:serialization
