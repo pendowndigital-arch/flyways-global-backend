@@ -1,0 +1,3 @@
+access user management api:
+  title: 'Access User Management API'
+  description: 'Allows access to the REST API endpoints of the user management system.'

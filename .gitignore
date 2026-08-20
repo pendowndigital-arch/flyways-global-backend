@@ -1,0 +1,36 @@
+# macOS
+.DS_Store
+
+# Composer-managed dependencies (recreated via `composer install`)
+/vendor/
+
+# Drupal core, scaffolded on `composer install` — not part of this repo
+/web/core/
+/web/modules/contrib/
+/web/themes/contrib/
+/web/profiles/contrib/
+/web/autoload.php
+/web/index.php
+/web/robots.txt
+/web/update.php
+/web/.htaccess
+/web/.ht.router.php
+/web/INSTALL.txt
+/web/README.md
+/web/example.gitignore
+
+# Environment-specific configuration — never shared across environments
+/web/sites/*/settings*.php
+!/web/sites/*/default.settings.php
+/web/sites/*/services*.yml
+!/web/sites/*/default.services.yml
+
+# User-uploaded content — lives per-environment, not in git
+/web/sites/*/files
+/web/sites/*/private
+
+# Multi-site test environment
+/web/sites/simpletest
+
+# DDEV local dev state
+.ddev/db_snapshots

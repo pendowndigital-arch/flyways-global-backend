@@ -1,0 +1,17 @@
+type: module
+name: Rest API
+description: 'Custom module to handle REST API for user registration.'
+package: Custom
+core_version_requirement: "^10.3 || ^11 || ^12"
+php: 8.1
+tags:
+  - custom
+dependencies:
+  - drupal:user
+  - drupal:rest
+  - drupal:serialization  
+  - drupal:restui  
+
+version: '1.0'
+project: 'restapi'
+datestamp: 1764211208

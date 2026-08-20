@@ -1,0 +1,74 @@
+user_management_api.register:
+  path: '/api/auth/register'
+  defaults:
+    _controller: '\Drupal\user_management_api\Controller\AuthController::register'
+  requirements:
+    _permission: 'access user management api'
+    _method: 'POST'
+  options:
+    _auth:
+      - oauth2
+
+user_management_api.login:
+  path: '/api/auth/login'
+  defaults:
+    _controller: '\Drupal\user_management_api\Controller\AuthController::login'
+  requirements:
+    _permission: 'access user management api'
+    _method: 'POST'
+
+user_management_api.logout:
+  path: '/api/auth/logout'
+  defaults:
+    _controller: '\Drupal\user_management_api\Controller\AuthController::logout'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _permission: 'access user management api'
+    _method: 'POST'
+  options:
+    _auth:
+      - oauth2
+
+user_management_api.verify_email:
+  path: '/api/auth/verify-email'
+  defaults:
+    _controller: '\Drupal\user_management_api\Controller\AuthController::verifyEmail'
+  requirements:
+    _permission: 'access user management api'
+    _method: 'GET'
+
+user_management_api.profile_get:
+  path: '/api/user/profile'
+  defaults:
+    _controller: '\Drupal\user_management_api\Controller\UserController::getProfile'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _permission: 'access user management api'
+    _method: 'GET'
+  options:
+    _auth:
+      - oauth2
+
+user_management_api.profile_update:
+  path: '/api/user/profile'
+  defaults:
+    _controller: '\Drupal\user_management_api\Controller\UserController::updateProfile'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _permission: 'access user management api'
+    _method: 'PUT'
+  options:
+    _auth:
+      - oauth2
+
+user_management_api.change_password:
+  path: '/api/user/password'
+  defaults:
+    _controller: '\Drupal\user_management_api\Controller\UserController::changePassword'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _permission: 'access user management api'
+    _method: 'POST'
+  options:
+    _auth:
+      - oauth2

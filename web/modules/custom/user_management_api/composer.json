@@ -1,0 +1,11 @@
+{
+  "name": "drupal/user_management_api",
+  "description": "Drupal 10/11 REST API module for authentication, user management, and email verification.",
+  "type": "drupal-module",
+  "license": "GPL-2.0-or-later",
+  "minimum-stability": "dev",
+  "require": {
+    "drupal/core": "^10.3 || ^11 || ^12",
+    "drupal/simple_oauth": "^6.0"
+  }
+}

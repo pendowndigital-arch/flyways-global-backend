@@ -1,0 +1,21 @@
+services:
+  user_management_api.response_manager:
+    class: Drupal\user_management_api\Service\ResponseManager
+
+  user_management_api.email_verification_manager:
+    class: Drupal\user_management_api\Service\EmailVerificationManager
+    arguments: ['@config.factory', '@plugin.manager.mail', '@entity_type.manager', '@event_dispatcher', '@state']
+
+  user_management_api.user_manager:
+    class: Drupal\user_management_api\Service\UserManager
+    arguments: ['@entity_type.manager', '@event_dispatcher']
+
+  user_management_api.auth_manager:
+    class: Drupal\user_management_api\Service\AuthManager
+    arguments: ['@entity_type.manager', '@current_user', '@event_dispatcher', '@user.auth', '@session', '@user_management_api.email_verification_manager']
+
+  user_management_api.audit_log_subscriber:
+    class: Drupal\user_management_api\EventSubscriber\AuditLogSubscriber
+    arguments: ['@logger.factory']
+    tags:
+      - { name: event_subscriber }
