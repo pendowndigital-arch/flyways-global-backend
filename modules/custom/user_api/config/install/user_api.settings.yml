@@ -1,0 +1,36 @@
+# Seconds an activation token stays valid (default 24 hours).
+activation_token_ttl: 86400
+# Front-end activation URL. Use [token] as the placeholder, e.g.
+# 'https://app.example.com/activate?token=[token]'. Leave empty to link
+# straight at the user_api.activate_link route on this site.
+activation_url: ''
+# Registration attempts allowed per IP within register_flood_window seconds.
+register_flood_limit: 5
+register_flood_window: 3600
+# Seconds a password reset token stays valid (default 1 hour).
+password_reset_token_ttl: 3600
+# Front-end password reset URL. Use [token] as the placeholder, e.g.
+# 'https://app.example.com/reset-password?token=[token]'. Leave empty to email
+# the raw token instead of a link; the app must then collect the new password
+# and call POST /api/user/password/reset itself.
+password_reset_url: ''
+# Password reset requests allowed per IP within password_reset_flood_window
+# seconds.
+password_reset_flood_limit: 5
+password_reset_flood_window: 3600
+# Account fields accepted at registration and through PATCH /api/user/me, on
+# top of the always-supported name, mail and password. Required user fields
+# must be listed here or registration cannot satisfy entity validation.
+editable_fields:
+  - field_fullname
+  - field_phone_number
+  - field_bio
+  - timezone
+  - preferred_langcode
+# Fields exposed in user payloads, on top of uid, name, mail, roles, status.
+exposed_fields:
+  - field_fullname
+  - field_phone_number
+  - field_bio
+  - timezone
+  - preferred_langcode

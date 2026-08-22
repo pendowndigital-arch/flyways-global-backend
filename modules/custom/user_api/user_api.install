@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Update hooks for the User API module.
+ */
+
+/**
+ * Adds the password reset configuration keys for sites installed before the
+ * forgot-password endpoints existed.
+ */
+function user_api_update_10001() {
+  $config = \Drupal::configFactory()->getEditable('user_api.settings');
+
+  $config->set('password_reset_token_ttl', $config->get('password_reset_token_ttl') ?? 3600);
+  $config->set('password_reset_url', $config->get('password_reset_url') ?? '');
+  $config->set('password_reset_flood_limit', $config->get('password_reset_flood_limit') ?? 5);
+  $config->set('password_reset_flood_window', $config->get('password_reset_flood_window') ?? 3600);
+
+  $config->save(TRUE);
+}

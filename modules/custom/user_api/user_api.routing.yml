@@ -1,0 +1,102 @@
+user_api.register:
+  path: '/api/user/register'
+  defaults:
+    _controller: '\Drupal\user_api\Controller\RegistrationController::register'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
+
+user_api.activate_link:
+  path: '/api/user/activate/{token}'
+  defaults:
+    _controller: '\Drupal\user_api\Controller\RegistrationController::activateFromLink'
+  methods: [GET]
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
+
+user_api.activate:
+  path: '/api/user/activate'
+  defaults:
+    _controller: '\Drupal\user_api\Controller\RegistrationController::activate'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
+
+user_api.activation_resend:
+  path: '/api/user/activation/resend'
+  defaults:
+    _controller: '\Drupal\user_api\Controller\RegistrationController::resend'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
+
+user_api.password_forgot:
+  path: '/api/user/password/forgot'
+  defaults:
+    _controller: '\Drupal\user_api\Controller\PasswordController::forgot'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
+
+user_api.password_reset:
+  path: '/api/user/password/reset'
+  defaults:
+    _controller: '\Drupal\user_api\Controller\PasswordController::reset'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
+
+user_api.login:
+  path: '/api/user/login'
+  defaults:
+    _controller: '\Drupal\user_api\Controller\AuthController::login'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
+
+user_api.logout:
+  path: '/api/user/logout'
+  defaults:
+    _controller: '\Drupal\user_api\Controller\AuthController::logout'
+  methods: [POST]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+  options:
+    _auth: ['oauth2']
+    no_cache: TRUE
+
+user_api.profile:
+  path: '/api/user/me'
+  defaults:
+    _controller: '\Drupal\user_api\Controller\ProfileController::get'
+  methods: [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+  options:
+    _auth: ['oauth2']
+    no_cache: TRUE
+
+user_api.profile_update:
+  path: '/api/user/me'
+  defaults:
+    _controller: '\Drupal\user_api\Controller\ProfileController::update'
+  methods: [PATCH, POST]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+  options:
+    _auth: ['oauth2']
+    no_cache: TRUE

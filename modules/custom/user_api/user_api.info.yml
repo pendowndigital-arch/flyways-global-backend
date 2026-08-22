@@ -1,0 +1,8 @@
+name: 'User API'
+type: module
+description: 'OAuth2 user management REST API: registration with email activation, login, profile update, forgot password and logout.'
+core_version_requirement: ^10.3 || ^11
+package: Custom
+dependencies:
+  - drupal:user
+  - simple_oauth:simple_oauth

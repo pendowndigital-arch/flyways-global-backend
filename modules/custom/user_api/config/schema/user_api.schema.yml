@@ -1,0 +1,40 @@
+user_api.settings:
+  type: config_object
+  label: 'User API settings'
+  mapping:
+    activation_token_ttl:
+      type: integer
+      label: 'Activation token lifetime in seconds'
+    activation_url:
+      type: string
+      label: 'Front-end activation URL template'
+    register_flood_limit:
+      type: integer
+      label: 'Registration attempts allowed per IP'
+    register_flood_window:
+      type: integer
+      label: 'Registration flood window in seconds'
+    password_reset_token_ttl:
+      type: integer
+      label: 'Password reset token lifetime in seconds'
+    password_reset_url:
+      type: string
+      label: 'Front-end password reset URL template'
+    password_reset_flood_limit:
+      type: integer
+      label: 'Password reset requests allowed per IP'
+    password_reset_flood_window:
+      type: integer
+      label: 'Password reset flood window in seconds'
+    editable_fields:
+      type: sequence
+      label: 'User fields editable through the API'
+      sequence:
+        type: string
+        label: 'Field name'
+    exposed_fields:
+      type: sequence
+      label: 'User fields exposed in API responses'
+      sequence:
+        type: string
+        label: 'Field name'

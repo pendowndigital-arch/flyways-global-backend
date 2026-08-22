@@ -1,0 +1,124 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations for the User API module.
+ */
+
+use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\user_api\Service\AccountActivation;
+
+/**
+ * Implements hook_mail_alter().
+ */
+function user_api_mail_alter(&$message) {
+  // The user already proved they own the address by following the activation
+  // link, so core's follow-up notice adds nothing but another one-time login
+  // URL in their inbox. Administrator-driven approvals still send it.
+  if ($message['id'] === 'user_status_activated' && AccountActivation::$activating) {
+    $message['send'] = FALSE;
+  }
+}
+
+/**
+ * Implements hook_mail().
+ */
+function user_api_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'activation':
+      _user_api_mail_activation($message, $params);
+      break;
+
+    case 'password_reset':
+      _user_api_mail_password_reset($message, $params);
+      break;
+  }
+}
+
+/**
+ * Builds the account activation email.
+ *
+ * @param array $message
+ *   The message array, altered by reference.
+ * @param array $params
+ *   Parameters from \Drupal\user_api\Service\AccountActivation::sendActivationMail().
+ */
+function _user_api_mail_activation(array &$message, array $params) {
+  $options = ['langcode' => $message['langcode']];
+  $site_name = \Drupal::config('system.site')->get('name');
+  /** @var \Drupal\user\UserInterface $account */
+  $account = $params['account'];
+
+  $message['subject'] = new TranslatableMarkup(
+    'Activate your @site account',
+    ['@site' => $site_name],
+    $options
+  );
+
+  $message['body'][] = new TranslatableMarkup(
+    'Hello @name,',
+    ['@name' => $account->getAccountName()],
+    $options
+  );
+  $message['body'][] = new TranslatableMarkup(
+    'An account was created for you at @site. Confirm this email address to activate the account:',
+    ['@site' => $site_name],
+    $options
+  );
+  $message['body'][] = $params['activation_url'];
+  $message['body'][] = new TranslatableMarkup(
+    'This link can be used once and expires in @hours hours. If you did not create this account, you can ignore this email.',
+    ['@hours' => $params['expiration_hours']],
+    $options
+  );
+}
+
+/**
+ * Builds the password reset email.
+ *
+ * @param array $message
+ *   The message array, altered by reference.
+ * @param array $params
+ *   Parameters from \Drupal\user_api\Service\PasswordReset::sendResetMail().
+ */
+function _user_api_mail_password_reset(array &$message, array $params) {
+  $options = ['langcode' => $message['langcode']];
+  $site_name = \Drupal::config('system.site')->get('name');
+  /** @var \Drupal\user\UserInterface $account */
+  $account = $params['account'];
+
+  $message['subject'] = new TranslatableMarkup(
+    'Reset your @site password',
+    ['@site' => $site_name],
+    $options
+  );
+
+  $message['body'][] = new TranslatableMarkup(
+    'Hello @name,',
+    ['@name' => $account->getAccountName()],
+    $options
+  );
+  $message['body'][] = new TranslatableMarkup(
+    'A password reset was requested for your @site account. If you did not request this, you can ignore this email.',
+    ['@site' => $site_name],
+    $options
+  );
+
+  if (!empty($params['reset_url'])) {
+    $message['body'][] = new TranslatableMarkup('Follow this link to choose a new password:', [], $options);
+    $message['body'][] = $params['reset_url'];
+  }
+  else {
+    $message['body'][] = new TranslatableMarkup('Your password reset code is:', [], $options);
+    $message['body'][] = $params['token'];
+  }
+
+  $message['body'][] = new PluralTranslatableMarkup(
+    $params['expiration_hours'],
+    'This can be used once and expires in 1 hour.',
+    'This can be used once and expires in @count hours.',
+    [],
+    $options
+  );
+}

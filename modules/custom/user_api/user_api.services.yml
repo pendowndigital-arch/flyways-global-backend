@@ -1,0 +1,90 @@
+services:
+  logger.channel.user_api:
+    parent: logger.channel_base
+    arguments: ['user_api']
+
+  # Renders kernel-level errors on /api/user/* as JSON rather than HTML.
+  user_api.exception_subscriber:
+    class: Drupal\user_api\EventSubscriber\ApiExceptionSubscriber
+    tags:
+      - { name: event_subscriber }
+
+  # Validates username/email + password and enforces account status and flood
+  # limits. Shared by the password grant and the profile update endpoint.
+  user_api.credentials_validator:
+    class: Drupal\user_api\Service\CredentialsValidator
+    arguments:
+      - '@entity_type.manager'
+      - '@user.auth'
+      - '@flood'
+      - '@config.factory'
+      - '@request_stack'
+      - '@user.data'
+
+  # league/oauth2-server user repository backing the "password" grant.
+  user_api.repository.user:
+    class: Drupal\user_api\Repository\UserRepository
+    arguments:
+      - '@user_api.credentials_validator'
+
+  # Derives a Drupal username from the email address a client signs up with.
+  user_api.username_generator:
+    class: Drupal\user_api\Service\UsernameGenerator
+    arguments:
+      - '@entity_type.manager'
+
+  # Creates accounts, issues activation tokens and sends activation email.
+  user_api.account_activation:
+    class: Drupal\user_api\Service\AccountActivation
+    arguments:
+      - '@entity_type.manager'
+      - '@keyvalue.expirable'
+      - '@user.data'
+      - '@plugin.manager.mail'
+      - '@config.factory'
+      - '@language_manager'
+      - '@logger.channel.user_api'
+
+  # Issues, mails and redeems password reset tokens. Mirrors
+  # user_api.account_activation's token pattern.
+  user_api.password_reset:
+    class: Drupal\user_api\Service\PasswordReset
+    arguments:
+      - '@entity_type.manager'
+      - '@keyvalue.expirable'
+      - '@user.data'
+      - '@plugin.manager.mail'
+      - '@config.factory'
+      - '@language_manager'
+      - '@logger.channel.user_api'
+
+  # Runs the password grant against the simple_oauth authorization server.
+  user_api.token_issuer:
+    class: Drupal\user_api\Service\TokenIssuer
+    arguments:
+      - '@simple_oauth.server.authorization_server.factory'
+      - '@simple_oauth.repositories.client'
+      - '@logger.channel.user_api'
+
+  # Deletes the access token (and optionally refresh token) behind a request.
+  user_api.token_revoker:
+    class: Drupal\user_api\Service\TokenRevoker
+    arguments:
+      - '@entity_type.manager'
+      - '@simple_oauth.server.resource_server.factory'
+      - '@psr7.http_message_factory'
+      - '@logger.channel.user_api'
+
+  # Stops simple_oauth from clearing every token of the account when the
+  # profile endpoint only changed non-sensitive fields.
+  user_api.token_expiry_trigger_handler:
+    class: Drupal\user_api\TokenExpiryTriggerHandler
+    decorates: 'Drupal\simple_oauth\TokenExpiryTriggerHandlerInterface'
+    arguments:
+      - '@user_api.token_expiry_trigger_handler.inner'
+
+  # Normalises a user account into the API response shape.
+  user_api.user_normalizer:
+    class: Drupal\user_api\Service\UserNormalizer
+    arguments:
+      - '@config.factory'
