@@ -19,3 +19,67 @@ function user_api_update_10001() {
 
   $config->save(TRUE);
 }
+
+/**
+ * Creates the fullname, phone number and bio fields on the user entity.
+ *
+ * These ship as config/install on new installs; sites where the module was
+ * already enabled before these fields existed need them created here
+ * instead, since config/install is only processed at first install.
+ */
+function user_api_update_10002() {
+  $fields = [
+    'field_fullname' => [
+      'type' => 'string',
+      'label' => 'Fullname',
+      'required' => TRUE,
+      'storage_settings' => [
+        'max_length' => 255,
+        'case_sensitive' => FALSE,
+        'is_ascii' => FALSE,
+      ],
+    ],
+    'field_phone_number' => [
+      'type' => 'string',
+      'label' => 'Phone Number',
+      'required' => TRUE,
+      'storage_settings' => [
+        'max_length' => 255,
+        'case_sensitive' => FALSE,
+        'is_ascii' => FALSE,
+      ],
+    ],
+    'field_bio' => [
+      'type' => 'string_long',
+      'label' => 'Bio',
+      'required' => FALSE,
+      'storage_settings' => [
+        'case_sensitive' => FALSE,
+      ],
+    ],
+  ];
+
+  foreach ($fields as $field_name => $info) {
+    if (!\Drupal\field\Entity\FieldStorageConfig::loadByName('user', $field_name)) {
+      \Drupal\field\Entity\FieldStorageConfig::create([
+        'field_name' => $field_name,
+        'entity_type' => 'user',
+        'type' => $info['type'],
+        'settings' => $info['storage_settings'],
+        'cardinality' => 1,
+        'translatable' => TRUE,
+      ])->save();
+    }
+
+    if (!\Drupal\field\Entity\FieldConfig::loadByName('user', 'user', $field_name)) {
+      \Drupal\field\Entity\FieldConfig::create([
+        'field_name' => $field_name,
+        'entity_type' => 'user',
+        'bundle' => 'user',
+        'label' => $info['label'],
+        'required' => $info['required'],
+        'translatable' => FALSE,
+      ])->save();
+    }
+  }
+}
