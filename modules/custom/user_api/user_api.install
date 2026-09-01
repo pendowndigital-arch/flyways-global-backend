@@ -83,3 +83,32 @@ function user_api_update_10002() {
     }
   }
 }
+
+/**
+ * Fixes sites where field_phone_number pre-dates the fields this module now
+ * expects: marks fullname/phone required, and adds phone number to the
+ * editable_fields and exposed_fields lists if a site's user_api.settings
+ * was created before phone number support existed.
+ *
+ * config:import cannot be relied on to carry this kind of settings change to
+ * every environment, so it is applied directly here instead.
+ */
+function user_api_update_10003() {
+  foreach (['field_fullname', 'field_phone_number'] as $field_name) {
+    $field = \Drupal\field\Entity\FieldConfig::loadByName('user', 'user', $field_name);
+    if ($field && !$field->isRequired()) {
+      $field->setRequired(TRUE);
+      $field->save();
+    }
+  }
+
+  $config = \Drupal::configFactory()->getEditable('user_api.settings');
+  foreach (['editable_fields', 'exposed_fields'] as $key) {
+    $fields = $config->get($key) ?? [];
+    if (!in_array('field_phone_number', $fields, TRUE)) {
+      $fields[] = 'field_phone_number';
+      $config->set($key, $fields);
+    }
+  }
+  $config->save(TRUE);
+}
