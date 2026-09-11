@@ -6,3 +6,4 @@ package: Custom
 dependencies:
   - drupal:user
   - simple_oauth:simple_oauth
+  - symfony_mailer:mailer_override

@@ -112,3 +112,52 @@ function user_api_update_10003() {
   }
   $config->save(TRUE);
 }
+
+/**
+ * Implements hook_install().
+ *
+ * Fresh installs already pull in symfony_mailer:mailer_override as a module
+ * dependency, so only the config it cannot ship via config/install (existing
+ * core config objects, not owned by this module) needs setting here.
+ */
+function user_api_install($is_syncing) {
+  _user_api_enable_html_mail();
+}
+
+/**
+ * Switches outgoing mail to render as HTML with clickable links, and fixes
+ * the site's default sender address so authentication (SPF) lines up with
+ * the domain it actually sends from.
+ *
+ * Sites where user_api was already installed before this existed need
+ * symfony_mailer:mailer_override installed explicitly - it only auto-installs
+ * as a dependency on a fresh module install, not retroactively - plus the
+ * same config a fresh install gets via user_api_install().
+ */
+function user_api_update_10004() {
+  \Drupal::service('module_installer')->install(['mailer_override']);
+  _user_api_enable_html_mail();
+}
+
+/**
+ * Shared by user_api_install() and user_api_update_10004().
+ */
+function _user_api_enable_html_mail() {
+  \Drupal::configFactory()->getEditable('system.mail')
+    ->set('interface.default', 'symfony_mailer')
+    ->save(TRUE);
+
+  // The site's mail was sending as an @gmail.com address while relaying
+  // through Hostinger's mail servers, which SPF does not authorize for that
+  // domain - a mismatch Gmail's own anti-spoofing checks reject outright,
+  // while other providers were more lenient about it.
+  $site_mail = \Drupal::configFactory()->getEditable('system.site');
+  if ($site_mail->get('mail') === 'pendowndigital@gmail.com') {
+    $site_mail->set('mail', 'no-reply@flywaysglobal.com')->save(TRUE);
+  }
+
+  $settings = \Drupal::configFactory()->getEditable('user_api.settings');
+  if (trim((string) $settings->get('password_reset_url')) === '') {
+    $settings->set('password_reset_url', 'https://flywaysglobal.com/password/reset/[token]')->save(TRUE);
+  }
+}
