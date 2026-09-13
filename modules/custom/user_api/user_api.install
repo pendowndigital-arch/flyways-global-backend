@@ -160,4 +160,19 @@ function _user_api_enable_html_mail() {
   if (trim((string) $settings->get('password_reset_url')) === '') {
     $settings->set('password_reset_url', 'https://flywaysglobal.com/password/reset/[token]')->save(TRUE);
   }
+  if (trim((string) $settings->get('activation_url')) === '') {
+    $settings->set('activation_url', 'https://flywaysglobal.com/user/activate/[token]')->save(TRUE);
+  }
+}
+
+/**
+ * Points the activation link at the frontend instead of the backend's own
+ * GET /api/user/activate/{token} route, so the frontend can call the API
+ * itself and show a clean result page rather than a raw JSON response.
+ *
+ * Re-runs _user_api_enable_html_mail(), which is safe to repeat: every
+ * setting it touches is only changed if still at its prior default.
+ */
+function user_api_update_10005() {
+  _user_api_enable_html_mail();
 }
