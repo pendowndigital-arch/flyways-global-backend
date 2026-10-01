@@ -1,0 +1,8 @@
+name: 'Article Views'
+type: module
+description: 'Tracks which authenticated users have viewed which articles, once per user per article, with total and per-article view-count endpoints.'
+core_version_requirement: ^10.3 || ^11
+package: Custom
+dependencies:
+  - drupal:node
+  - user_api:user_api

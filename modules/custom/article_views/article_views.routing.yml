@@ -1,0 +1,32 @@
+article_views.record:
+  path: '/api/article/{nid}/view'
+  defaults:
+    _controller: '\Drupal\article_views\Controller\ArticleViewController::record'
+  methods: [POST]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    nid: \d+
+  options:
+    _auth: ['oauth2']
+    no_cache: TRUE
+
+article_views.article_count:
+  path: '/api/article/{nid}/views'
+  defaults:
+    _controller: '\Drupal\article_views\Controller\ArticleViewController::articleCount'
+  methods: [GET]
+  requirements:
+    _access: 'TRUE'
+    nid: \d+
+  options:
+    no_cache: TRUE
+
+article_views.total_count:
+  path: '/api/articles/views/total'
+  defaults:
+    _controller: '\Drupal\article_views\Controller\ArticleViewController::totalCount'
+  methods: [GET]
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE

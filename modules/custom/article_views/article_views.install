@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * @file
+ * Install, update and schema hooks for the Article Views module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function article_views_schema() {
+  $schema['article_views'] = [
+    'description' => 'Records that a user has viewed an article. One row per (uid, nid) pair.',
+    'fields' => [
+      'uid' => [
+        'description' => 'The {users}.uid that viewed the article.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'nid' => [
+        'description' => 'The {node}.nid of the viewed article.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'viewed' => [
+        'description' => 'Unix timestamp of the first view.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+    ],
+    // The composite primary key is what makes a second view a no-op: the
+    // database itself rejects a duplicate (uid, nid) row, so the "only once"
+    // rule holds even under two concurrent requests from the same user.
+    'primary key' => ['uid', 'nid'],
+    'indexes' => [
+      // Supports the per-article view count (COUNT(*) WHERE nid = :nid).
+      'nid' => ['nid'],
+    ],
+  ];
+
+  return $schema;
+}

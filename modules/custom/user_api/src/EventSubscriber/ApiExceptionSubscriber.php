@@ -19,14 +19,20 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class ApiExceptionSubscriber implements EventSubscriberInterface {
 
   /**
-   * Route name prefix owned by this module.
+   * Route name prefixes of modules that share this JSON error envelope.
+   *
+   * article_views depends on user_api specifically to reuse this handling,
+   * rather than duplicating it, so its routes are listed here too.
    */
-  const ROUTE_PREFIX = 'user_api.';
+  const ROUTE_PREFIXES = ['user_api.', 'article_views.'];
 
   /**
-   * Path prefix owned by this module.
+   * Path prefixes of modules that share this JSON error envelope.
+   *
+   * Used only when no route matched at all (e.g. a typoed path), so there is
+   * no route name to check against ROUTE_PREFIXES.
    */
-  const PATH_PREFIX = '/api/user';
+  const PATH_PREFIXES = ['/api/user', '/api/article', '/api/articles'];
 
   /**
    * {@inheritdoc}
@@ -105,12 +111,23 @@ class ApiExceptionSubscriber implements EventSubscriberInterface {
   protected function isApiRequest(Request $request): bool {
     $route_name = (string) $request->attributes->get('_route');
     if ($route_name !== '') {
-      return str_starts_with($route_name, self::ROUTE_PREFIX);
+      foreach (self::ROUTE_PREFIXES as $prefix) {
+        if (str_starts_with($route_name, $prefix)) {
+          return TRUE;
+        }
+      }
+      return FALSE;
     }
 
     // No route matched, e.g. a 404 or a rejected method, so fall back to the
     // path the client asked for.
-    return str_starts_with($request->getPathInfo(), self::PATH_PREFIX);
+    $path = $request->getPathInfo();
+    foreach (self::PATH_PREFIXES as $prefix) {
+      if (str_starts_with($path, $prefix)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }
