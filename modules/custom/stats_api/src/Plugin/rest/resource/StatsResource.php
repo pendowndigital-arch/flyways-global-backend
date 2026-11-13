@@ -65,10 +65,12 @@ class StatsResource extends ResourceBase {
    * Responds to GET requests.
    */
   public function get() {
-    // Count articles (nodes of type 'article').
+    // Count published articles only. Access checks alone do not exclude
+    // unpublished nodes for users who can view them (admins, editors).
     $article_query = \Drupal::entityQuery('node')
       ->accessCheck(TRUE)
       ->condition('type', 'article')
+      ->condition('status', 1)
       ->count();
     $article_count = $article_query->execute();
 
