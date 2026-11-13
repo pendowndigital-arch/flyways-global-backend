@@ -2,6 +2,7 @@
 
 namespace Drupal\stats_api\Plugin\rest\resource;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -90,7 +91,14 @@ class StatsResource extends ResourceBase {
     ];
 
     $response = new ResourceResponse($data);
-    $response->addCacheableDependency(\Drupal::service('config.factory')->getEditable('stats_api.settings'));
+    // The counts change whenever an article, user or term is created, edited
+    // or deleted, so the cached response must be invalidated by those lists.
+    // Counts are access-checked, so they can differ by permission set.
+    $response->addCacheableDependency(
+      (new CacheableMetadata())
+        ->setCacheTags(['node_list:article', 'user_list', 'taxonomy_term_list'])
+        ->setCacheContexts(['user.permissions'])
+    );
     return $response;
   }
 
